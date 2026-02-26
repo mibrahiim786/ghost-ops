@@ -12,12 +12,40 @@ default_model = "claude-sonnet-4.6"
 [missions.portfolio_watchdog]
 enabled = true
 schedule = "0 9,21 * * *"
-repos = ["DUBSOpenHub/havoc-hackathon", "DUBSOpenHub/dark-factory"]
+repos = [
+  "DUBSOpenHub/ghost-ops",
+  "DUBSOpenHub/dark-factory",
+  "DUBSOpenHub/havoc-hackathon",
+  "DUBSOpenHub/agent-xray",
+  "DUBSOpenHub/copilot-cli-mastery",
+  "DUBSOpenHub/ai-agent-catalog",
+  "DUBSOpenHub/ai-toil-tracker",
+  "DUBSOpenHub/copilot-cli-quickstart",
+  "DUBSOpenHub/My-AI-Readme",
+  "DUBSOpenHub/copilot-cli-agent-marketplace",
+  "DUBSOpenHub/shadow-score-spec",
+  "DUBSOpenHub/soss-ai-command-center",
+  "DUBSOpenHub/GitHub-Secure-security-activation-template",
+]
 
 [missions.inbox_autopilot]
 enabled = true
 schedule = "0 * * * *"
-repos = ["DUBSOpenHub/havoc-hackathon", "DUBSOpenHub/dark-factory"]
+repos = [
+  "DUBSOpenHub/ghost-ops",
+  "DUBSOpenHub/dark-factory",
+  "DUBSOpenHub/havoc-hackathon",
+  "DUBSOpenHub/agent-xray",
+  "DUBSOpenHub/copilot-cli-mastery",
+  "DUBSOpenHub/ai-agent-catalog",
+  "DUBSOpenHub/ai-toil-tracker",
+  "DUBSOpenHub/copilot-cli-quickstart",
+  "DUBSOpenHub/My-AI-Readme",
+  "DUBSOpenHub/copilot-cli-agent-marketplace",
+  "DUBSOpenHub/shadow-score-spec",
+  "DUBSOpenHub/soss-ai-command-center",
+  "DUBSOpenHub/GitHub-Secure-security-activation-template",
+]
 auto_label = true
 auto_draft = true
 auto_close_stale_days = 30
