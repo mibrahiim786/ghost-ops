@@ -1,0 +1,34 @@
+[ghost_ops]
+log_level = "INFO"
+db_path = "ghost_ops.db"
+elo_path = "~/.copilot/hackathon-elo.json"
+agents_dir = "~/.copilot/agents"
+
+[llm]
+primary = "github-models"
+fallback = "amplifier"
+default_model = "claude-sonnet-4.6"
+
+[missions.portfolio_watchdog]
+enabled = true
+schedule = "* * * * *"
+repos = ["DUBSOpenHub/havoc-hackathon", "DUBSOpenHub/dark-factory"]
+
+[missions.inbox_autopilot]
+enabled = true
+schedule = "0 * * * *"
+repos = ["DUBSOpenHub/havoc-hackathon", "DUBSOpenHub/dark-factory"]
+auto_label = true
+auto_draft = true
+auto_close_stale_days = 30
+
+[missions.fleet_evolution]
+enabled = true
+schedule = "0 3 * * *"
+evolution_batch_size = 3
+consensus_threshold = 2
+validator_models = ["claude-opus-4.6", "gpt-5.2", "claude-sonnet-4.6"]
+
+[alerts]
+write_to_db = true
+create_github_issue = false
