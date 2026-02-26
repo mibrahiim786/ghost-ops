@@ -11,7 +11,7 @@ default_model = "claude-sonnet-4.6"
 
 [missions.portfolio_watchdog]
 enabled = true
-schedule = "* * * * *"
+schedule = "0 9,21 * * *"
 repos = ["DUBSOpenHub/havoc-hackathon", "DUBSOpenHub/dark-factory"]
 
 [missions.inbox_autopilot]
