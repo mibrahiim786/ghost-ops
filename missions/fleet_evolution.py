@@ -47,6 +47,40 @@ def _file_hash(content: str) -> str:
     return hashlib.sha256(content.encode()).hexdigest()[:16]
 
 
+async def _xray_score(content: str, ctx: Any) -> int | None:
+    """Run Agent X-Ray on content and return composite score (0-100), or None on error.
+
+    Writes content to a temp file, runs agent-xray.js --json, parses result.
+    Zero tokens — pure deterministic pattern matching.
+    """
+    import tempfile
+    xray_path = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) / "agent-xray.js"
+    if not xray_path.exists():
+        logger.debug("[fleet_evolution] agent-xray.js not found at %s", xray_path)
+        return None
+
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False, encoding="utf-8") as f:
+        f.write(content)
+        tmp_path = f.name
+
+    try:
+        proc = await asyncio.create_subprocess_exec(
+            "node", str(xray_path), tmp_path, "--json",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        stdout, _ = await proc.communicate()
+        if proc.returncode != 0:
+            return None
+        data = json.loads(stdout.decode())
+        return int(data.get("composite", 0))
+    except Exception as exc:
+        logger.debug("[fleet_evolution] X-Ray scan failed: %s", exc)
+        return None
+    finally:
+        os.unlink(tmp_path)
+
+
 def _get_sample_task(agent_id: str) -> str:
     """Return a representative task string for the given agent ID."""
     _TASKS = {
@@ -165,6 +199,43 @@ async def _mutate_agent(agent_path: Path, ctx: Any) -> dict[str, Any] | None:
             mutated_content = original_content + "\n<!-- ghost-ops-evolved: stub mutation applied -->\n"
 
     mutated_hash = _file_hash(mutated_content)
+
+    # X-Ray quality gate — reject mutations that lower the deterministic composite score
+    xray_original = await _xray_score(original_content, ctx)
+    xray_mutated = await _xray_score(mutated_content, ctx)
+    if xray_original is not None and xray_mutated is not None:
+        logger.info(
+            "[fleet_evolution] X-Ray gate %s: original=%d mutated=%d",
+            agent_id, xray_original, xray_mutated,
+        )
+        if xray_mutated < xray_original:
+            logger.info(
+                "[fleet_evolution] X-Ray rejected %s: mutated score %d < original %d",
+                agent_id, xray_mutated, xray_original,
+            )
+            await ctx.store.record_mutation(
+                agent_id=agent_id,
+                original_hash=original_hash,
+                mutated_hash=mutated_hash,
+                mutation_type="improvement",
+                validators=["xray-rejected"],
+                consensus="rejected",
+                deployed=False,
+                ab_score_original=float(xray_original),
+                ab_score_mutated=float(xray_mutated),
+                ab_task="xray-composite",
+                ab_winner="original",
+            )
+            return {
+                "agent_id": agent_id,
+                "original_hash": original_hash,
+                "mutated_hash": mutated_hash,
+                "consensus": "rejected",
+                "approvals": 0,
+                "mutation_id": 0,
+                "ab_winner": "original",
+                "xray_rejected": True,
+            }
 
     # A/B test the mutation before validation
     sample_task = _get_sample_task(agent_id)

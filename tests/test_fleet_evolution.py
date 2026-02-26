@@ -10,7 +10,7 @@ from unittest.mock import MagicMock
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from missions.fleet_evolution import _get_sample_task, _ab_test_agent, _resolve_consensus
+from missions.fleet_evolution import _get_sample_task, _ab_test_agent, _resolve_consensus, _xray_score
 
 
 def run(coro):
@@ -108,6 +108,43 @@ class TestConsensusWithAB(unittest.TestCase):
     def test_ab_mutated_winner_insufficient_rejected(self) -> None:
         # AB winner="mutated" but only 1/3 validators → rejected
         self.assertEqual(_resolve_consensus(1, "mutated", 2), "rejected")
+
+
+class TestXRayScore(unittest.TestCase):
+    """_xray_score runs deterministic pattern matching on agent content."""
+
+    def test_xray_returns_int(self) -> None:
+        content = "You are an expert assistant.\nNever fabricate data.\nIf unsure, say so."
+        ctx = MagicMock()
+        result = run(_xray_score(content, ctx))
+        if result is not None:  # Node.js available
+            self.assertIsInstance(result, int)
+            self.assertGreaterEqual(result, 0)
+            self.assertLessEqual(result, 100)
+
+    def test_xray_better_prompt_higher_score(self) -> None:
+        weak = "Do stuff."
+        strong = (
+            "You are an expert code reviewer.\n"
+            "Never fabricate data or error messages.\n"
+            "If you are unsure, say so explicitly.\n"
+            "Only cite verified sources.\n"
+            "Format all output as markdown with headings.\n"
+            "If you cannot complete the task, escalate to the user.\n"
+            "For example: if asked to review code, respond with a structured review.\n"
+            "Do not access files outside the current working directory.\n"
+        )
+        ctx = MagicMock()
+        score_weak = run(_xray_score(weak, ctx))
+        score_strong = run(_xray_score(strong, ctx))
+        if score_weak is not None and score_strong is not None:
+            self.assertGreater(score_strong, score_weak)
+
+    def test_xray_empty_content(self) -> None:
+        ctx = MagicMock()
+        result = run(_xray_score("", ctx))
+        if result is not None:
+            self.assertEqual(result, 0)
 
 
 if __name__ == "__main__":
