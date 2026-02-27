@@ -107,7 +107,7 @@ ghost-ops/
 
 ## 🚑 Grid Medic
 
-Fleet Evolution is the daemon implementation of the **[Grid Medic](https://github.com/DUBSOpenHub/ghost-ops/blob/main/missions/fleet_evolution.py)** 🚑 pattern — a self-healing meta-agent that continuously monitors, repairs, and improves the agent fleet.
+Fleet Evolution is the daemon implementation of the **[🚑 Grid Medic](https://github.com/DUBSOpenHub/ghost-ops/blob/main/missions/fleet_evolution.py)** pattern — a self-healing meta-agent that continuously monitors, repairs, and improves the agent fleet.
 
 | Capability | How It Works |
 |---|---|
