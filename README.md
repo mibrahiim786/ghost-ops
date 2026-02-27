@@ -119,7 +119,7 @@ Fleet Evolution is the daemon implementation of the **[🚑 Grid Medic](https://
 | **Agent X-Ray integration** | Scores agent files with deterministic pattern matching (zero tokens) |
 | **Paired-file sync** | Keeps co-located copies (e.g., skill files) in sync after approved mutations |
 
-When used interactively via Copilot CLI, 🚑 Grid Medic is available as a standalone agent (`grid-medic`) that can diagnose, improve, and validate individual agents on demand. Fleet Evolution runs the same logic autonomously on a schedule.
+When used interactively via Copilot CLI, 🚑 **Grid Medic** is available as a standalone agent (`grid-medic`) that can diagnose, improve, and validate individual agents on demand. Fleet Evolution runs the same logic autonomously on a schedule.
 
 ## Testing
 
