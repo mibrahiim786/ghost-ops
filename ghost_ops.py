@@ -31,6 +31,7 @@ from lib.state import StateStore
 import missions.portfolio_watchdog as _portfolio_watchdog
 import missions.inbox_autopilot as _inbox_autopilot
 import missions.fleet_evolution as _fleet_evolution
+import missions.sentinel as _sentinel
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -177,6 +178,7 @@ _MISSION_MODULES = {
     "portfolio_watchdog": _portfolio_watchdog,
     "inbox_autopilot": _inbox_autopilot,
     "fleet_evolution": _fleet_evolution,
+    "sentinel": _sentinel,
 }
 
 # Default cron schedules (overridden by config)
@@ -184,6 +186,7 @@ _DEFAULT_SCHEDULES = {
     "portfolio_watchdog": "0 6 * * *",   # nightly 6 AM
     "inbox_autopilot":    "0 * * * *",   # every hour
     "fleet_evolution":    "0 3 * * *",   # daily 3 AM
+    "sentinel":           "30 8,20 * * *",  # 8:30 AM/PM
 }
 
 
@@ -397,7 +400,7 @@ def _parse_args() -> argparse.Namespace:
         default=None,
         metavar="NAME",
         help="Run only this named mission once then exit "
-             "(portfolio_watchdog|inbox_autopilot|fleet_evolution)",
+             "(portfolio_watchdog|inbox_autopilot|fleet_evolution|sentinel)",
     )
     p.add_argument(
         "--log-level",

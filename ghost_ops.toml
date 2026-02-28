@@ -64,6 +64,43 @@ validator_models = ["claude-opus-4.6", "gpt-5.2", "claude-sonnet-4.6"]
   "~/dev/havoc-hackathon/skills/havoc-hackathon/SKILL.md",
 ]
 
+[missions.sentinel]
+enabled = true
+schedule = "30 8,20 * * *"
+repos = [
+  "DUBSOpenHub/ghost-ops",
+  "DUBSOpenHub/dark-factory",
+  "DUBSOpenHub/havoc-hackathon",
+  "DUBSOpenHub/agent-xray",
+  "DUBSOpenHub/copilot-cli-mastery",
+  "DUBSOpenHub/ai-agent-catalog",
+  "DUBSOpenHub/ai-toil-tracker",
+  "DUBSOpenHub/copilot-cli-quickstart",
+  "DUBSOpenHub/My-AI-Readme",
+  "DUBSOpenHub/copilot-cli-agent-marketplace",
+  "DUBSOpenHub/shadow-score-spec",
+  "DUBSOpenHub/soss-ai-command-center",
+  "DUBSOpenHub/GitHub-Secure-security-activation-template",
+  "DUBSOpenHub/oss-radar",
+  "DUBSOpenHub/ospo-toil-tracker",
+]
+
+[missions.sentinel.thresholds]
+consecutive_failures = 3
+stale_cron_hours = 48
+issue_spam_count = 5
+gap_multiplier = 2.5
+
+[[missions.sentinel.data_freshness]]
+repo = "DUBSOpenHub/ai-toil-tracker"
+path = "docs/dashboard/dashboard-data.json"
+max_age_hours = 48
+
+[[missions.sentinel.data_freshness]]
+repo = "DUBSOpenHub/ospo-toil-tracker"
+path = "docs/dashboard/dashboard-data.json"
+max_age_hours = 48
+
 [alerts]
 write_to_db = true
 create_github_issue = false
