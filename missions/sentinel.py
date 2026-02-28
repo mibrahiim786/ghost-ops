@@ -743,6 +743,105 @@ async def _check_venv_health(
 
     return findings
 
+
+# ---------------------------------------------------------------------------
+# Check 11: Repo Discovery — flag repos missing from config
+# ---------------------------------------------------------------------------
+
+async def _check_repo_coverage(
+    config: dict[str, Any], dry_run: bool
+) -> list[Finding]:
+    """Discover all org repos and flag any not in the config."""
+    findings: list[Finding] = []
+
+    if dry_run:
+        return [Finding("INFO", "repo_coverage", None, "Dry run: would check repo coverage")]
+
+    org = config.get("missions", {}).get("sentinel", {}).get("org", "DUBSOpenHub")
+    excluded = set(config.get("missions", {}).get("sentinel", {}).get("excluded_repos", ["awesome-copilot"]))
+
+    # Get all org repos
+    rc, stdout, _ = await _gh_cli("repo", "list", org, "--json", "name", "--limit", "50")
+    if rc != 0:
+        return findings
+
+    try:
+        all_repos = {r["name"] for r in json.loads(stdout)}
+    except (json.JSONDecodeError, KeyError):
+        return findings
+
+    # Collect all repos across all missions
+    configured = set()
+    for mission_cfg in config.get("missions", {}).values():
+        if isinstance(mission_cfg, dict):
+            for r in mission_cfg.get("repos", []):
+                configured.add(r.split("/")[-1])
+
+    missing = all_repos - configured - excluded
+    if missing:
+        findings.append(Finding(
+            "WARN", "repo_coverage", None,
+            f"Repos in {org} not tracked by any mission: {', '.join(sorted(missing))}. "
+            f"Add to ghost_ops.toml or exclude in sentinel.excluded_repos",
+        ))
+
+    return findings
+
+
+# ---------------------------------------------------------------------------
+# Check 12: Dev ↔ Deployed drift
+# ---------------------------------------------------------------------------
+
+async def _check_dev_deployed_drift(
+    config: dict[str, Any], dry_run: bool
+) -> list[Finding]:
+    """Compare key files between dev and deployed directories."""
+    findings: list[Finding] = []
+
+    if dry_run:
+        return [Finding("INFO", "dev_drift", None, "Dry run: would check dev/deployed drift")]
+
+    dev_dir = Path(os.path.expanduser("~/dev/ghost-ops"))
+    deployed_dir = Path(os.path.expanduser(
+        config.get("ghost_ops", {}).get("db_path", "ghost_ops.db")
+    )).parent
+
+    if not dev_dir.exists() or not deployed_dir.exists():
+        return findings
+
+    # Check key files
+    check_files = [
+        "ghost_ops.py", "ghost_ops.toml",
+        "lib/state.py", "lib/llm_backend.py", "lib/elo_router.py",
+    ]
+    # Also check all mission files
+    for f in dev_dir.glob("missions/*.py"):
+        check_files.append(f"missions/{f.name}")
+
+    drifted = []
+    for rel_path in check_files:
+        dev_file = dev_dir / rel_path
+        deployed_file = deployed_dir / rel_path
+        if not dev_file.exists() or not deployed_file.exists():
+            if dev_file.exists() and not deployed_file.exists():
+                drifted.append(f"{rel_path} (missing from deployed)")
+            continue
+
+        dev_hash = hashlib.sha256(dev_file.read_bytes()).hexdigest()[:12]
+        dep_hash = hashlib.sha256(deployed_file.read_bytes()).hexdigest()[:12]
+        if dev_hash != dep_hash:
+            drifted.append(rel_path)
+
+    if drifted:
+        findings.append(Finding(
+            "WARN", "dev_drift", None,
+            f"Dev ↔ deployed drift in: {', '.join(drifted)}. "
+            f"Run the post-commit hook or manually sync.",
+        ))
+
+    return findings
+
+
 # ---------------------------------------------------------------------------
 # Mission entry point
 # ---------------------------------------------------------------------------
@@ -778,11 +877,12 @@ async def run(ctx: Any) -> dict[str, Any]:
             _prune_db(full_config, ctx.dry_run),
             _check_agent_quality(full_config, ctx.dry_run),
             _check_venv_health(full_config, ctx.dry_run),
+            _check_dev_deployed_drift(full_config, ctx.dry_run),
             return_exceptions=True,
         )
         check_names = [
             "daemon_liveness", "config_sanity", "file_drift",
-            "db_pruning", "agent_quality", "venv_health",
+            "db_pruning", "agent_quality", "venv_health", "dev_drift",
         ]
     else:
         # Full check suite
@@ -796,12 +896,15 @@ async def run(ctx: Any) -> dict[str, Any]:
             _prune_db(full_config, ctx.dry_run),
             _check_agent_quality(full_config, ctx.dry_run),
             _check_venv_health(full_config, ctx.dry_run),
+            _check_repo_coverage(full_config, ctx.dry_run),
+            _check_dev_deployed_drift(full_config, ctx.dry_run),
             return_exceptions=True,
         )
         check_names = [
             "actions_health", "daemon_liveness", "data_freshness",
             "config_sanity", "file_drift", "secret_alignment",
             "db_pruning", "agent_quality", "venv_health",
+            "repo_coverage", "dev_drift",
         ]
 
     all_findings: list[Finding] = list(auth_findings)
